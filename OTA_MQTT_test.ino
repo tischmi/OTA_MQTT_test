@@ -1,5 +1,4 @@
 /* Qelle https://github.com/tischmi/ota-mqtt/blob/master/ota-mqtt/ota-mqtt.ino 
-
 HUMIDOR Projekt
 ---------------
 + MQTT
@@ -8,8 +7,6 @@ HUMIDOR Projekt
 + BUILTIN_LED blink
 + DHT22
 + deep sleep nach http://lazyzero.de/elektronik/esp8266/dht_deepsleep/start
-
-
 -RTC richiges Timing(mqtt-Versand) per NTP
 */
 
@@ -46,27 +43,27 @@ String mqtt_base_topic="home/ESP07S01";
 #define waterlevel_topic "/waterlevel"
 
 // DHT config
-#define DHTPIN            D1       // what digital pin we're connected to
-#define DHTTYPE           DHT22    // DHT 11/22
-#define DHTINTERVAL_T     5000     // ms Temperature
-#define DHTINTERVAL_H     10000    // ms Humidity
+#define DHTPIN            D1		// what digital pin we're connected to
+#define DHTTYPE           DHT22		// DHT 11/22
+#define DHTINTERVAL_T     5000		// ms Temperature
+#define DHTINTERVAL_H     10000		// ms Humidity
 
-#define DEEPSLEEP         60       // Verweildauer im Deep Sleep in Minuten
-#define DEEPSLEEPINTERVAL 30000    // schalte in DEep Sleep alle 30 Sekunden
+#define DEEPSLEEP         60		// Verweildauer im Deep Sleep in Minuten
+#define DEEPSLEEPINTERVAL 30000		// schalte in DEep Sleep alle 30 Sekunden
 #define FORCE_DEEPSLEEP
 
-#define LEDBLINKINTERVAL  1000      // LED Binkinterval in ms
+#define LEDBLINKINTERVAL  1000		// LED Binkinterval in ms
 
 #define SR04INTERVAL      1000      // ms
-const int PumpPin =  D6;      //
+#define PumpPin			  D6;      	//
 
-const int SENSORHIGHT = 40;
-const int NANOHIGHT   = 30;
-const int WatterHightMax = 28;
-const int WatterHightMin = 20;
+const int SENSORHEIGHT 		= 40;	// in cm
+const int NANOHEIGHT   		= 30;
+const int WatterHEIGHTMax 	= 28;
+const int WatterHEIGHTMin 	= 20;
 
-int PumpPinState = LOW;    // Pumpe aus
-int Watterlevel = NANOHIGHT;
+int PumpPinState = LOW;    			// Pumpe aus
+int Watterlevel = NANOHEIGHT;
 
 int BUILTIN_LED_state =1;
 
@@ -126,7 +123,7 @@ void BUILTIN_LED_blink(){
 void SR04_distance_mqtt_push() {
   char msg[50];
   int Distance = ultrasonic.distanceRead();
-  Watterlevel = SENSORHIGHT - Distance;
+  Watterlevel = SENSORHEIGHT - Distance;
   Serial.print("Wasserstand in CM: ");  Serial.println(Watterlevel);
 //  String sWatterlevel = String(Watterlevel);
 //  snprintf (msg, 50, "%s",sWatterlevel);
@@ -234,6 +231,7 @@ void setup() {
   // lass die LED blinken
   Serial.println("Setup BUILTIN_LED Timer...");
   pinMode(LED_BUILTIN, OUTPUT);
+
   pinMode(PumpPin, OUTPUT);
   
   timer_BUILTIN_LED.setInterval(LEDBLINKINTERVAL, BUILTIN_LED_blink);
@@ -271,22 +269,17 @@ void mqtt_reconnect() {
   }
 }
 
+/*
 bool checkBound(float newValue, float prevValue, float maxDiff) {
   return(true);
   return newValue < prevValue - maxDiff || newValue > prevValue + maxDiff;
 }
+*/
 
-long now =0; //in ms
-long lastMsg = 0;
-float temp = 0.0;
-float hum = 0.0;
-float diff = 1.0;
-int min_timeout=2000; //in ms
+// float hum = 0.0;
 
 void loop() {
-  
   ArduinoOTA.handle();
-  
   if (!mqtt_client.connected()) {
     mqtt_reconnect();
   }
@@ -295,7 +288,7 @@ void loop() {
   timer_BUILTIN_LED.run();      // timer zum LED blinken
   timer_DHT_humidity.run();     // timer DHT humidity
   timer_DHT_temperature.run();  // timer DHT temperature
-  timer_SR04_distance.run();     // timer SR04 distance
+  timer_SR04_distance.run();    // timer SR04 distance
 
   timer_deepsleep.run();
   
