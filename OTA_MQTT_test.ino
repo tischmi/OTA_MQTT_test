@@ -55,7 +55,7 @@ String mqtt_base_topic="home/ESP07S01";
 #define LEDBLINKINTERVAL  1000		// LED Binkinterval in ms
 
 #define SR04INTERVAL      1000      // ms
-#define PumpPin			  D6;      	//
+#define PumpPin			        D6      	//
 
 const int SENSORHEIGHT 		= 40;	// in cm
 const int NANOHEIGHT   		= 30;
